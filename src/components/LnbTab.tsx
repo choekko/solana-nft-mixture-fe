@@ -1,17 +1,29 @@
 /** @jsxImportSource @emotion/react */
 import { css, Theme } from '@emotion/react';
+import { useState } from 'react';
 
 interface LnbTabProps {
   tabName: 'home' | 'purchase' | 'log' | 'mix' | 'compare';
-  isClicked: boolean;
+  isCurrentTab: boolean;
 }
 
-const LnbTab = ({ tabName, isClicked }: LnbTabProps) => {
-  const iconColorType = isClicked ? 'skyblue' : 'dark';
+const LnbTab = ({ tabName, isCurrentTab }: LnbTabProps) => {
+  const [isActive, setIsActive] = useState(isCurrentTab);
+  const iconColorType = isActive ? 'skyblue' : 'dark';
+
+  const handleMouseEnter = () => {
+    setIsActive(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (!isCurrentTab) {
+      setIsActive(false);
+    }
+  };
 
   return (
     <>
-      <div css={theme => LabTabStyle(theme, isClicked)}>
+      <div css={theme => LabTabStyle(theme, isActive)} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         <img src={`/assets/icon/${tabName}_${iconColorType}.png`} alt={tabName} />
         <span>{tabName}</span>
       </div>
@@ -19,14 +31,14 @@ const LnbTab = ({ tabName, isClicked }: LnbTabProps) => {
   );
 };
 
-const LabTabStyle = (theme: Theme, isClicked: boolean) => css`
+const LabTabStyle = (theme: Theme, isActive: boolean) => css`
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
   width: 100px;
   height: 100px;
-  background-color: ${isClicked ? 'white' : theme.color.skyblue};
+  background-color: ${isActive ? 'white' : theme.color.skyblue};
 
   img {
     width: 50px;
@@ -34,7 +46,7 @@ const LabTabStyle = (theme: Theme, isClicked: boolean) => css`
   }
 
   span {
-    color: ${isClicked ? theme.color.skyblue : theme.color.dark};
+    color: ${isActive ? theme.color.skyblue : theme.color.dark};
     font-weight: bold;
   }
 `;

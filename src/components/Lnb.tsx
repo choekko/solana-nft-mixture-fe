@@ -16,7 +16,7 @@ const Lnb = () => {
         <img src="/assets/icon/logo_temporary.png" alt="logo" />
       </div>
       {tabs.map(tab => (
-        <LnbTab key={tab} tabName={tab} isClicked={tab === currentTab} />
+        <LnbTab key={tab} tabName={tab} isCurrentTab={tab === currentTab} />
       ))}
     </nav>
   );
