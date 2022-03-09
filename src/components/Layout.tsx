@@ -13,7 +13,9 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div>
       <Lnb />
-      <section css={mainSectionCss}>{children}</section>
+      <div css={mainSectionWrapCss}>
+        <section>{children}</section>
+      </div>
       <div css={WalletBtnWrapCss}>
         <WalletBtn />
       </div>
@@ -21,10 +23,18 @@ const Layout = ({ children }: LayoutProps) => {
   );
 };
 
-const mainSectionCss = (theme: Theme) => css`
-  margin-left: 100px;
+const mainSectionWrapCss = (theme: Theme) => css`
+  padding-left: 100px;
   background-color: ${theme.color.backgroundDeepDark};
   height: 100vh;
+  display: flex;
+  justify-content: center;
+
+  & > section {
+    width: 1024px;
+    display: flex;
+    align-items: center;
+  }
 `;
 
 const WalletBtnWrapCss = css`
