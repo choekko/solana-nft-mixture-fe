@@ -1,6 +1,6 @@
 const theme = {
   color: {
-    skyblue: '#0000ff',
+    skyblue: '#3DA1FF',
     dark: '#333333',
     backgroundDark: '#1C1C1C',
     backgroundDeepDark: '#0C0F13',

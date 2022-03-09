@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 
 import Lnb from './Lnb';
-import { css } from '@emotion/react';
+import { css, Theme } from '@emotion/react';
 import React from 'react';
 
 interface LayoutProps {
@@ -17,8 +17,10 @@ const Layout = ({ children }: LayoutProps) => {
   );
 };
 
-const mainSectionStyle = css`
+const mainSectionStyle = (theme: Theme) => css`
   margin-left: 100px;
+  background-color: ${theme.color.backgroundDeepDark};
+  height: 100vh;
 `;
 
 export default Layout;
