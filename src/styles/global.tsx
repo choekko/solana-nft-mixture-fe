@@ -127,6 +127,12 @@ const style = css`
     border-collapse: collapse;
     border-spacing: 0;
   }
+  button {
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    cursor: pointer;
+  }
 `;
 
 const GlobalStyle = () => {

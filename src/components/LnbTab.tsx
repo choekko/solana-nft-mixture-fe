@@ -23,10 +23,14 @@ const LnbTab = ({ tabName, isCurrentTab }: LnbTabProps) => {
 
   return (
     <>
-      <div css={theme => LabTabStyle(theme, isActive)} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <button
+        css={theme => LabTabStyle(theme, isActive)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <img src={`/assets/icon/${tabName}_${iconColorType}.png`} alt={tabName} />
         <span>{tabName}</span>
-      </div>
+      </button>
     </>
   );
 };
@@ -39,6 +43,7 @@ const LabTabStyle = (theme: Theme, isActive: boolean) => css`
   width: 100px;
   height: 100px;
   background-color: ${isActive ? 'white' : theme.color.skyblue};
+  border: 0.5px solid ${theme.color.dark};
 
   img {
     width: 50px;
