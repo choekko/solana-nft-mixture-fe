@@ -2,13 +2,9 @@
 
 import { css, Theme } from '@emotion/react';
 import LnbTab from './LnbTab';
-import { useLocation } from 'react-router-dom';
 
 const Lnb = () => {
-  const location = useLocation();
   const tabs = ['home', 'purchase', 'mix', 'log', 'compare'] as const;
-  const currentFirstPath = location.pathname.split('/')[1];
-  const currentTab = currentFirstPath === '' ? 'home' : currentFirstPath;
 
   return (
     <nav css={lnbCss}>
@@ -16,10 +12,10 @@ const Lnb = () => {
         <div css={logoCss}>
           <img src="/assets/icon/logo_temporary.png" alt="logo" />
         </div>
-        {tabs.map(tab => tab !== 'compare' && <LnbTab key={tab} tabName={tab} isCurrentTab={tab === currentTab} />)}
+        {tabs.map(tab => tab !== 'compare' && <LnbTab key={tab} tabName={tab} />)}
       </div>
       <div css={{ marginBottom: '20px' }}>
-        <LnbTab tabName="compare" isCurrentTab={currentTab === 'compare'} />
+        <LnbTab tabName="compare" />
       </div>
     </nav>
   );

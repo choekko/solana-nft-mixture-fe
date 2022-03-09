@@ -1,14 +1,25 @@
 /** @jsxImportSource @emotion/react */
 import { css, Theme } from '@emotion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface LnbTabProps {
   tabName: 'home' | 'purchase' | 'log' | 'mix' | 'compare';
-  isCurrentTab: boolean;
 }
 
-const LnbTab = ({ tabName, isCurrentTab }: LnbTabProps) => {
-  const [isActive, setIsActive] = useState(isCurrentTab);
+const LnbTab = ({ tabName }: LnbTabProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isActive, setIsActive] = useState(false);
+
+  const currentFirstPath = location.pathname.split('/')[1];
+  const currentTab = currentFirstPath === '' ? 'home' : currentFirstPath;
+  const isCurrentTab = tabName === currentTab;
+
+  useEffect(() => {
+    setIsActive(isCurrentTab);
+  }, [isCurrentTab]);
+
   const iconColorType = isActive ? 'skyblue' : 'dark';
 
   const handleMouseEnter = () => {
@@ -21,12 +32,21 @@ const LnbTab = ({ tabName, isCurrentTab }: LnbTabProps) => {
     }
   };
 
+  const handleClick = () => {
+    if (tabName === 'home') {
+      navigate('/');
+      return;
+    }
+    navigate(`/${tabName}`);
+  };
+
   return (
     <>
       <button
         css={theme => LabTabStyle(theme, tabName, isActive)}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onClick={handleClick}
       >
         <img src={`/assets/icon/${tabName}_${iconColorType}.png`} alt={tabName} />
         {tabName !== 'compare' && <span>{tabName}</span>}

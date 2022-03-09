@@ -1,5 +1,7 @@
+/** @jsxImportSource @emotion/react */
+
 const Main = () => {
-  return <span>야호</span>;
+  return <span css={{ color: 'white' }}>메인</span>;
 };
 
 export default Main;
