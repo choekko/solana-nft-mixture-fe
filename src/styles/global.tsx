@@ -1,3 +1,5 @@
+/** @jsxImportSource @emotion/react */
+
 import { Global, css } from '@emotion/react';
 
 const style = css`
@@ -124,6 +126,12 @@ const style = css`
   table {
     border-collapse: collapse;
     border-spacing: 0;
+  }
+  button {
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    cursor: pointer;
   }
 `;
 
