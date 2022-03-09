@@ -24,26 +24,31 @@ const LnbTab = ({ tabName, isCurrentTab }: LnbTabProps) => {
   return (
     <>
       <button
-        css={theme => LabTabStyle(theme, isActive)}
+        css={theme => LabTabStyle(theme, tabName, isActive)}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <img src={`/assets/icon/${tabName}_${iconColorType}.png`} alt={tabName} />
-        <span>{tabName}</span>
+        {tabName !== 'compare' && <span>{tabName}</span>}
       </button>
     </>
   );
 };
 
-const LabTabStyle = (theme: Theme, isActive: boolean) => css`
+const LabTabStyle = (theme: Theme, tabName: string, isActive: boolean) => css`
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  width: 100px;
-  height: 100px;
+  width: ${tabName === 'compare' ? '70px' : '100px'};
+  height: ${tabName === 'compare' ? '70px' : '100px'};
   background-color: ${isActive ? 'white' : theme.color.skyblue};
   border: 0.5px solid ${theme.color.dark};
+
+  ${tabName === 'compare' &&
+  css`
+    border-radius: 20px;
+  `}
 
   img {
     width: 50px;

@@ -6,23 +6,30 @@ import { useLocation } from 'react-router-dom';
 
 const Lnb = () => {
   const location = useLocation();
-  const tabs = ['home', 'purchase', 'mix', 'log'] as const;
+  const tabs = ['home', 'purchase', 'mix', 'log', 'compare'] as const;
   const currentFirstPath = location.pathname.split('/')[1];
   const currentTab = currentFirstPath === '' ? 'home' : currentFirstPath;
 
   return (
     <nav css={lnbCss}>
-      <div css={logoCss}>
-        <img src="/assets/icon/logo_temporary.png" alt="logo" />
+      <div css={{ flex: 'none' }}>
+        <div css={logoCss}>
+          <img src="/assets/icon/logo_temporary.png" alt="logo" />
+        </div>
+        {tabs.map(tab => tab !== 'compare' && <LnbTab key={tab} tabName={tab} isCurrentTab={tab === currentTab} />)}
       </div>
-      {tabs.map(tab => (
-        <LnbTab key={tab} tabName={tab} isCurrentTab={tab === currentTab} />
-      ))}
+      <div css={{ marginBottom: '20px' }}>
+        <LnbTab tabName="compare" isCurrentTab={currentTab === 'compare'} />
+      </div>
     </nav>
   );
 };
 
 const lnbCss = (theme: Theme) => css`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   position: fixed;
   width: 100px;
   height: 100%;
