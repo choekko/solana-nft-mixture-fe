@@ -1,12 +1,46 @@
 /** @jsxImportSource @emotion/react */
 import { css, Theme } from '@emotion/react';
+import { useWalletModal, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useEffect } from 'react';
 
 const WalletBtn = () => {
+  const { setVisible } = useWalletModal();
+  const { wallet, connect, publicKey } = useWallet();
+
+  useEffect(() => {
+    if (!publicKey && wallet) {
+      try {
+        connect();
+      } catch (error) {
+        console.log('Error connecting to the wallet: ', (error as any).message);
+      }
+    }
+  }, [wallet]);
+
+  const handleWalletClick = () => {
+    try {
+      if (!wallet) {
+        setVisible(true);
+      } else {
+        connect();
+      }
+    } catch (error) {
+      console.log('Error connecting to the wallet: ', (error as any).message);
+    }
+  };
+
   return (
-    <button css={WalletBtnCss}>
-      <img src="/assets/icon/wallet_dark.png" css={{ width: '30px' }} />
-      <span> Wallet </span>
-    </button>
+    <>
+      {wallet ? (
+        <WalletMultiButton />
+      ) : (
+        <button css={WalletBtnCss} onClick={handleWalletClick}>
+          <img src="/assets/icon/wallet_dark.png" css={{ width: '30px' }} />
+          <span> Wallet </span>
+        </button>
+      )}
+    </>
   );
 };
 

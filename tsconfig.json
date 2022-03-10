@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "baseUrl": "src",
     "lib": [
       "dom",
       "dom.iterable",
@@ -19,7 +20,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react"
+    "jsxImportSource": "@emotion/react",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
   },
   "include": [
     "src"
