@@ -22,6 +22,7 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
+    "no-debugger": 0,
     "eqeqeq": ["error", "always"],
     "prettier/prettier": "warn",
     "no-unexpected-multiline": "error",

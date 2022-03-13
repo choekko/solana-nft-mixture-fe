@@ -1,9 +1,10 @@
 import React from 'react';
+import MintMachine from 'components/core/MintMachine';
 
 /** @jsxImportSource @emotion/react */
 
 const Main = () => {
-  return <span css={{ color: 'white' }}></span>;
+  return <MintMachine />;
 };
 
 export default Main;
