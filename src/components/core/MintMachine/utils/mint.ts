@@ -12,8 +12,9 @@ import { SystemProgram, SYSVAR_SLOT_HASHES_PUBKEY, TransactionInstruction } from
 import { getAtaForMint } from 'components/core/MintMachine/utils/solana';
 import { CandyMachineInfo } from 'components/core/MintMachine/types/candy';
 import { TOKEN_METADATA_PROGRAM_ID } from 'components/core/MintMachine/const/candy';
-import { getCandyMachineCreator, getMetadata } from 'components/core/MintMachine/utils/candy-machine';
+import { getCandyMachineCreator } from 'components/core/MintMachine/utils/candy-machine';
 import { sendTransactions } from 'components/core/MintMachine/utils/connection';
+import { getMasterEdition, getMetadata } from 'components/core/MintMachine/utils/metaplex';
 
 export const mintOneToken = async (
   candyMachineInfo: CandyMachineInfo,
@@ -42,6 +43,7 @@ export const mintOneToken = async (
     ]; // ------- signer : mint
 
     const metadataAddress = await getMetadata(mint.publicKey);
+    const masterEdition = await getMasterEdition(mint.publicKey);
 
     const [candyMachineCreator, creatorBump] = await getCandyMachineCreator(candyMachineAddress);
 
@@ -54,6 +56,7 @@ export const mintOneToken = async (
           wallet: candyMachineInfo.state.treasury,
           mint: mint.publicKey,
           metadata: metadataAddress,
+          masterEdition,
           mintAuthority: payer,
           updateAuthority: payer,
           tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,

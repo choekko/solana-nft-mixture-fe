@@ -1,12 +1,15 @@
 /** @jsxImportSource @emotion/react */
 import { css, Theme } from '@emotion/react';
+import MintMachine from 'components/core/MintMachine';
 
 const MintBox = () => {
   return (
     <div css={MintBoxCss}>
       <img src="/assets/potion_gif.gif" />
       <span> Random Reagent X 1</span>
-      <button> Mint </button>
+      <div css={MintMachineStyle}>
+        <MintMachine />
+      </div>
     </div>
   );
 };
@@ -32,8 +35,10 @@ const MintBoxCss = (theme: Theme) => css`
     color: white;
     font-size: 24px;
   }
+`;
 
-  & > button {
+const MintMachineStyle = (theme: Theme) => css`
+  button {
     width: 200px;
     height: 50px;
     border-radius: 20px;
@@ -42,7 +47,12 @@ const MintBoxCss = (theme: Theme) => css`
     font-size: 22px;
     font-weight: bold;
 
-    &:hover {
+    &:disabled {
+      background-color: #777777;
+      cursor: default;
+    }
+
+    &:hover:not(:disabled) {
       background-color: white;
     }
   }

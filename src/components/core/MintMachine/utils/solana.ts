@@ -1,6 +1,6 @@
 import * as anchor from '@project-serum/anchor';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from 'components/core/example/CandyMachine/example/utils';
+import { SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from 'components/core/MintMachine/const/candy';
 
 export const getAtaForMint = async (
   mint: anchor.web3.PublicKey, // 민트 어카운트

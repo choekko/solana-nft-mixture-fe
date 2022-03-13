@@ -1,10 +1,10 @@
 import React from 'react';
-import MintMachine from 'components/core/MintMachine';
+import TitleBox from 'components/TitleBox';
 
 /** @jsxImportSource @emotion/react */
 
 const Main = () => {
-  return <MintMachine />;
+  return <TitleBox title="Main" />;
 };
 
 export default Main;

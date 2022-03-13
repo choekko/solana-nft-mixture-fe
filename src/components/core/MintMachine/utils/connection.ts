@@ -13,6 +13,7 @@ import {
 } from '@solana/web3.js';
 
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
+import * as anchor from '@project-serum/anchor';
 
 interface BlockhashAndFeeCalculator {
   blockhash: Blockhash;
@@ -122,15 +123,12 @@ export const sendTransactions = async (
   commitment: Commitment = 'singleGossip',
   successCallback: (txid: string, ind: number) => void = () => {},
   failCallback: (reason: string, ind: number) => boolean = () => false,
-  block?: BlockhashAndFeeCalculator,
 ): Promise<{ number: number; txs: { txid: string; slot: number }[] }> => {
   if (!wallet.publicKey) throw new WalletNotConnectedError();
 
   const unsignedTxns: Transaction[] = [];
 
-  if (!block) {
-    block = await connection.getRecentBlockhash(commitment);
-  }
+  const block = await connection.getLatestBlockhash(commitment);
 
   for (let i = 0; i < instructionSet.length; i++) {
     const instructions = instructionSet[i];
@@ -140,14 +138,9 @@ export const sendTransactions = async (
       continue;
     }
 
-    let transaction = new Transaction();
+    let transaction = new Transaction({ feePayer: wallet.publicKey });
     instructions.forEach(instruction => transaction.add(instruction));
     transaction.recentBlockhash = block.blockhash;
-    transaction.setSigners(
-      // fee payed by the wallet owner
-      wallet.publicKey,
-      ...signers.map(s => s.publicKey),
-    );
 
     if (signers.length > 0) {
       transaction.partialSign(...signers);
@@ -163,11 +156,12 @@ export const sendTransactions = async (
   let breakEarlyObject = { breakEarly: false, i: 0 };
   console.log('Signed txns length', signedTxns.length, 'vs handed in length', instructionSet.length);
   for (let i = 0; i < signedTxns.length; i++) {
+    console.log('heeeeerrree');
     const signedTxnPromise = sendSignedTransaction({
       connection,
       signedTransaction: signedTxns[i],
     });
-
+    console.log('heeeeerrree2');
     signedTxnPromise
       .then(({ txid }) => {
         successCallback(txid, i);
@@ -180,9 +174,11 @@ export const sendTransactions = async (
           breakEarlyObject.i = i;
         }
       });
-
+    console.log('heeeeerrree3');
     if (sequenceType !== SequenceType.Parallel) {
       try {
+        console.log('heeeeerrree4');
+
         await signedTxnPromise;
       } catch (e) {
         console.log('Caught failure', e);
@@ -250,7 +246,12 @@ export const sendTransaction = async (
   let slot = 0;
 
   if (awaitConfirmation) {
-    const confirmation = await awaitTransactionSignatureConfirmation(txid, DEFAULT_TIMEOUT, connection, commitment);
+    const confirmation = await awaitTransactionSignatureConfirmationWithCommitment(
+      txid,
+      DEFAULT_TIMEOUT,
+      connection,
+      commitment,
+    );
 
     if (!confirmation) throw new Error('Timed out awaiting confirmation on transaction');
     slot = confirmation?.slot || 0;
@@ -348,7 +349,13 @@ export async function sendSignedTransaction({
     }
   })();
   try {
-    const confirmation = await awaitTransactionSignatureConfirmation(txid, timeout, connection, 'recent', true);
+    const confirmation = await awaitTransactionSignatureConfirmationWithCommitment(
+      txid,
+      timeout,
+      connection,
+      'confirmed',
+      true,
+    );
 
     if (!confirmation) throw new Error('Timed out awaiting confirmation on transaction');
 
@@ -415,7 +422,70 @@ async function simulateTransaction(
   return res.result;
 }
 
-async function awaitTransactionSignatureConfirmation(
+export const awaitTransactionSignatureConfirmation = async (
+  txid: anchor.web3.TransactionSignature,
+  timeout: number,
+  connection: anchor.web3.Connection,
+  queryStatus = false,
+): Promise<anchor.web3.SignatureStatus | null | void> => {
+  let done = false;
+  let status: anchor.web3.SignatureStatus | null | void = {
+    slot: 0,
+    confirmations: 0,
+    err: null,
+  };
+  let subId = 0;
+  status = await new Promise(async (resolve, reject) => {
+    setTimeout(() => {
+      if (done) {
+        return;
+      }
+      done = true;
+      console.log('Rejecting for timeout...');
+      reject({ timeout: true });
+    }, timeout);
+
+    while (!done && queryStatus) {
+      // eslint-disable-next-line no-loop-func
+      (async () => {
+        try {
+          const signatureStatuses = await connection.getSignatureStatuses([txid]);
+          status = signatureStatuses && signatureStatuses.value[0];
+          if (!done) {
+            if (!status) {
+              console.log('REST null result for', txid, status);
+            } else if (status.err) {
+              console.log('REST error for', txid, status);
+              done = true;
+              reject(status.err);
+            } else if (!status.confirmations) {
+              console.log('REST no confirmations for', txid, status);
+            } else {
+              console.log('REST confirmation for', txid, status);
+              done = true;
+              resolve(status);
+            }
+          }
+        } catch (e) {
+          if (!done) {
+            console.log('REST connection error: txid', txid, e);
+          }
+        }
+      })();
+      await sleep(2000);
+    }
+  });
+
+  //@ts-ignore
+  if (connection._signatureSubscriptions[subId]) {
+    connection.removeSignatureListener(subId);
+  }
+  done = true;
+  console.log('Returning status', status);
+  return status;
+};
+
+async function awaitTransactionSignatureConfirmationWithCommitment(
   txid: TransactionSignature,
   timeout: number,
   connection: Connection,
@@ -429,7 +499,7 @@ async function awaitTransactionSignatureConfirmation(
     err: null,
   };
   let subId = 0;
-  status = await new Promise((resolve, reject) => {
+  status = await new Promise(async (resolve, reject) => {
     setTimeout(() => {
       if (done) {
         return;
@@ -489,7 +559,7 @@ async function awaitTransactionSignatureConfirmation(
           }
         }
       })();
-      sleep(2000);
+      await sleep(2000);
     }
   });
 
