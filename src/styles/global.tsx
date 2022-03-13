@@ -133,6 +133,9 @@ const style = css`
     outline: none;
     cursor: pointer;
   }
+  span {
+    color: white;
+  }
 `;
 
 const GlobalStyle = () => {
