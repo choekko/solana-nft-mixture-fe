@@ -1,7 +1,7 @@
 import * as anchor from '@project-serum/anchor';
 import { MIXTURE_MACHINE_PROGRAM } from 'components/core/MintMachine/const/candy';
 import { makeParentMetaData } from 'components/core/MixtureMachine/utils/metaData';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 interface UploaderResponse {
   status: 'success' | 'fail';
@@ -25,9 +25,12 @@ export const getMixtureMachineId = async (
       childrenAttributes,
     });
 
-    const response: UploaderResponse = await axios.post('localhost:8082/upload', requestData);
+    const response: AxiosResponse<UploaderResponse> = await axios.post('http://54.180.95.41:8082/upload', requestData);
     console.log('upload response::', response);
-    return new anchor.web3.PublicKey(response.mixture);
+    if (response.data.status === 'fail') {
+      throw new Error('upload fail');
+    }
+    return new anchor.web3.PublicKey(response.data.mixture);
 
     // return new anchor.web3.PublicKey('5qboT7jgnuWNQvSShNKegNbKwzAGkJohhYdZcHdbqUxW');
   } catch (e) {
