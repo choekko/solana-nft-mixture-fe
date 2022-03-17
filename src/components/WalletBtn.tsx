@@ -58,6 +58,10 @@ const WalletBtnCss = (theme: Theme) => css`
   gap: 8px;
   padding-right: 15px;
 
+  span {
+    color: ${theme.color.dark};
+  }
+
   &:hover {
     background-color: white;
   }
