@@ -50,7 +50,7 @@ export const mintOneToken = async (
     instructions.push(
       await candyMachineInfo.program.instruction.mintNft(creatorBump, {
         accounts: {
-          candyMachine: candyMachineAddress, //
+          candyMachine: candyMachineAddress,
           candyMachineCreator,
           payer: payer,
           wallet: candyMachineInfo.state.treasury,
