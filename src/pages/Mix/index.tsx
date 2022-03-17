@@ -117,6 +117,12 @@ const Mix = () => {
     return [...leftMint, ...rightMint];
   }, [leftReagent, rightReagent]);
 
+  const childrenAttributes = useMemo(() => {
+    const leftAttributes = leftReagent ? leftReagent.attributes.map(attribute => attribute.value) : [];
+    const rightAttributes = rightReagent ? rightReagent.attributes.map(attribute => attribute.value) : [];
+    return [...leftAttributes, ...rightAttributes];
+  }, [leftReagent, rightReagent]);
+
   return (
     <div css={mixWrapStyle}>
       <TitleBox title="Mix Reagents" subTitle="You can also mix mixture." />
@@ -135,6 +141,7 @@ const Mix = () => {
           <MixtureMachine
             mixBtnCss={mixtureMachineBtnStyle}
             childMints={childMints}
+            childrenAttributes={childrenAttributes}
             minChildMintsNumber={2}
             setIsMixing={setIsMixing}
             isMixing={isProcessing}
