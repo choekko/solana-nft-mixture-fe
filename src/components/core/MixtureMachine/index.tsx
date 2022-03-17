@@ -10,6 +10,7 @@ import { SerializedStyles, Theme } from '@emotion/react';
 
 interface MixtureMachineProps {
   childMints: anchor.web3.PublicKey[];
+  childrenAttributes: string[];
   minChildMintsNumber: number;
   setIsMixing?: Dispatch<SetStateAction<boolean>>;
   isMixing?: boolean;
@@ -19,6 +20,7 @@ interface MixtureMachineProps {
 
 const MixtureMachine = ({
   childMints,
+  childrenAttributes,
   minChildMintsNumber,
   mixBtnCss,
   setIsMixing,
@@ -47,25 +49,33 @@ const MixtureMachine = ({
     } as anchor.Wallet;
   }, [wallet]);
 
-  const mixtureMachineId = getMixtureMachineId();
+  console.log(childrenAttributes);
 
   const handleClick = async () => {
-    if (!anchorWallet || !wallet || !wallet.publicKey || !mixtureMachineId) return;
+    if (!anchorWallet || !wallet || !wallet.publicKey) return;
 
     setIsMixing?.(true);
 
-    const mixtureMachineInfo = await getMixtureMachineState(anchorWallet, mixtureMachineId, connection);
-    const mintTxId = (await mix(mixtureMachineInfo, wallet.publicKey, childMints))[0];
-    const txTimeoutInMilliseconds = 15000;
+    try {
+      const mintKeyPair = anchor.web3.Keypair.generate();
+      const mixtureMachineId = await getMixtureMachineId(
+        wallet.publicKey,
+        mintKeyPair.publicKey,
+        childMints,
+        childrenAttributes,
+      );
+      const mixtureMachineInfo = await getMixtureMachineState(anchorWallet, mixtureMachineId, connection);
+      const mintTxId = (await mix(mintKeyPair, mixtureMachineInfo, wallet.publicKey, childMints))[0];
+      const txTimeoutInMilliseconds = 15000;
 
-    if (mintTxId) {
-      try {
+      if (mintTxId) {
         await awaitTransactionSignatureConfirmation(mintTxId, txTimeoutInMilliseconds, connection, true);
         callbackAfterMix?.();
-      } catch (error) {
-        setIsMixing?.(false);
       }
+    } catch (error) {
+      setIsMixing?.(false);
     }
+
     setIsMixing?.(false);
   };
 

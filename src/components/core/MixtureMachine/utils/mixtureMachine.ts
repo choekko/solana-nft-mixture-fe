@@ -1,12 +1,37 @@
 import * as anchor from '@project-serum/anchor';
 import { MIXTURE_MACHINE_PROGRAM } from 'components/core/MintMachine/const/candy';
+import { makeParentMetaData } from 'components/core/MixtureMachine/utils/metaData';
+import axios from 'axios';
 
-export const getMixtureMachineId = (): anchor.web3.PublicKey | undefined => {
+interface UploaderResponse {
+  status: 'success' | 'fail';
+  arweaveLink: string;
+  mixture: string;
+}
+
+export const getMixtureMachineId = async (
+  payer: anchor.web3.PublicKey,
+  mint: anchor.web3.PublicKey,
+  childMints: anchor.web3.PublicKey[],
+  childrenAttributes: string[],
+): Promise<anchor.web3.PublicKey> => {
   try {
-    return new anchor.web3.PublicKey('5qboT7jgnuWNQvSShNKegNbKwzAGkJohhYdZcHdbqUxW');
+    const requestData = makeParentMetaData({
+      uniqNumber: 2,
+      imageNumber: 2,
+      payer,
+      parentNftMint: mint,
+      childNftMints: childMints,
+      childrenAttributes,
+    });
+
+    const response: UploaderResponse = await axios.post('localhost:8082/upload', requestData);
+    console.log('upload response::', response);
+    return new anchor.web3.PublicKey(response.mixture);
+
+    // return new anchor.web3.PublicKey('5qboT7jgnuWNQvSShNKegNbKwzAGkJohhYdZcHdbqUxW');
   } catch (e) {
-    console.log('Failed to construct MixtureMachine', e);
-    return undefined;
+    throw new Error('Failed to construct MixtureMachine [업로더 실패]');
   }
 };
 

@@ -16,6 +16,7 @@ import { MixtureMachine } from 'components/core/MixtureMachine/types/mixtureMach
 import { getMixtureMachineCreator } from 'components/core/MixtureMachine/utils/mixtureMachine';
 
 export const mix = async (
+  newMintKeyPair: anchor.web3.Keypair,
   mixtureMachineInfo: MixtureMachine,
   payer: anchor.web3.PublicKey, // 지갑 주소
   childMints: anchor.web3.PublicKey[],
@@ -23,7 +24,7 @@ export const mix = async (
   try {
     const mixtureMachineAddress = mixtureMachineInfo.id;
 
-    const mint = anchor.web3.Keypair.generate(); // 아마 랜덤 키쌍을 만드는 거겠지?
+    const mint = newMintKeyPair;
     const userTokenAccountAddress = (await getAtaForMint(mint.publicKey, payer))[0];
 
     const signers: anchor.web3.Keypair[] = [mint]; // signers는 아래 instructions와 1:1 매칭이라고 생각하면 좋아.
