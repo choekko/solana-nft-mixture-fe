@@ -159,7 +159,7 @@ const Compose = () => {
 
   return (
     <div css={composeWrapStyle}>
-      <TitleBox title="Mix Reagents" subTitle="You can also compose mixture." />
+      <TitleBox title="Compose Reagents" subTitle="You can also compose mixture." />
       {!wallet.publicKey && (
         <label css={loginMessageStyle} htmlFor="wallet_btn">
           <span>Please Connect Wallet</span>

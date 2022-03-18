@@ -105,7 +105,7 @@ const Decompose = () => {
   return (
     <>
       <div css={decomposeWrapStyle}>
-        <TitleBox title="Separate Mixture" subTitle="You can get the reagents back before synthesizing" />
+        <TitleBox title="Decompose Mixture" subTitle="You can get the reagents back before synthesizing" />
         {!wallet?.publicKey && (
           <label css={loginMessageStyle} htmlFor="wallet_btn">
             <span>Please Connect Wallet</span>
