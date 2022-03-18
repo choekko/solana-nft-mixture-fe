@@ -81,8 +81,7 @@ const Decompose = () => {
     setReagentNftsData(
       reagentNftsData.map(reagentNftData => ({
         ...reagentNftData,
-        isClicked:
-          reagentNftData.mint === clickedReagentNftData.mint ? !reagentNftData.isClicked : reagentNftData.isClicked,
+        isClicked: reagentNftData.mint === clickedReagentNftData.mint ? !reagentNftData.isClicked : false,
       })),
     );
   };
