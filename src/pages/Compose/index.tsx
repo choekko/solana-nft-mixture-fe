@@ -134,7 +134,7 @@ const Compose = () => {
   };
 
   const callbackAfterCompose = () => {
-    alert('Complete!\n See your wallet or inventory in Decompose Page');
+    alert('Complete!\nSee your wallet or inventory in Decompose Page');
     window.location.reload();
   };
 
