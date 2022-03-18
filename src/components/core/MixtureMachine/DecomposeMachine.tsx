@@ -87,7 +87,7 @@ const DecomposeMachine = ({
       {isLoading || isDecomposing ? (
         <>
           <BallTriangle ariaLabel="loading-indicator" color={theme.color.skyblue} width={20} height={20} />
-          {isDecomposing && <span style={{ color: theme.color.skyblue, marginLeft: '10px' }}>Composing...</span>}
+          {isDecomposing && <span style={{ color: theme.color.skyblue, marginLeft: '10px' }}>Decomposing...</span>}
         </>
       ) : (
         'Decompose'
