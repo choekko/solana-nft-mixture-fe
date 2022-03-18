@@ -5,37 +5,43 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import * as anchor from '@project-serum/anchor';
 import { awaitTransactionSignatureConfirmation } from 'components/core/MintMachine/utils/connection';
 import { getMixtureMachineId, getMixtureMachineState } from 'components/core/MixtureMachine/utils/mixtureMachine';
-import { mix } from 'components/core/MixtureMachine/utils/mix';
+import { compose } from 'components/core/MixtureMachine/utils/compose';
 import { SerializedStyles, Theme } from '@emotion/react';
+import { BallTriangle } from 'react-loader-spinner';
+import theme from 'styles/theme';
 
-interface MixtureMachineProps {
+interface ComposeMachineProps {
   childMints: anchor.web3.PublicKey[];
-  childrenAttributes: string[];
+  childrenAttributes: Array<{ trait_type: string; value: string }>;
   minChildMintsNumber: number;
-  setIsMixing?: Dispatch<SetStateAction<boolean>>;
-  isMixing?: boolean;
-  callbackAfterMix?: () => void;
-  mixBtnCss?: ((theme: Theme) => SerializedStyles) | SerializedStyles;
+  setIsComposing?: Dispatch<SetStateAction<boolean>>;
+  isComposing?: boolean;
+  isLoading?: boolean;
+  callbackAfterCompose?: () => void;
+  composeBtnCss?: ((theme: Theme) => SerializedStyles) | SerializedStyles;
 }
 
-const MixtureMachine = ({
+const ComposeMachine = ({
   childMints,
   childrenAttributes,
   minChildMintsNumber,
-  mixBtnCss,
-  setIsMixing,
-  isMixing,
-  callbackAfterMix,
-}: MixtureMachineProps) => {
-  const [isMixPossible, setIsMixPossible] = useState(false);
+  composeBtnCss,
+  setIsComposing,
+  isComposing,
+  isLoading,
+  callbackAfterCompose,
+}: ComposeMachineProps) => {
+  const [isComposePossible, setIsComposePossible] = useState(false);
   const wallet = useWallet();
   const { connection } = useConnection();
 
   useEffect(() => {
     if (childMints.length === minChildMintsNumber) {
-      setIsMixPossible(true);
+      setIsComposePossible(true);
+      return;
     }
-  });
+    setIsComposePossible(false);
+  }, [childMints]);
 
   const anchorWallet = useMemo(() => {
     if (!wallet || !wallet.publicKey || !wallet.signAllTransactions || !wallet.signTransaction) {
@@ -49,12 +55,10 @@ const MixtureMachine = ({
     } as anchor.Wallet;
   }, [wallet]);
 
-  console.log(childrenAttributes);
-
   const handleClick = async () => {
     if (!anchorWallet || !wallet || !wallet.publicKey) return;
 
-    setIsMixing?.(true);
+    setIsComposing?.(true);
 
     try {
       const mintKeyPair = anchor.web3.Keypair.generate();
@@ -65,25 +69,32 @@ const MixtureMachine = ({
         childrenAttributes,
       );
       const mixtureMachineInfo = await getMixtureMachineState(anchorWallet, mixtureMachineId, connection);
-      const mintTxId = (await mix(mintKeyPair, mixtureMachineInfo, wallet.publicKey, childMints))[0];
+      const mintTxId = (await compose(mintKeyPair, mixtureMachineInfo, wallet.publicKey, childMints))[0];
       const txTimeoutInMilliseconds = 15000;
 
       if (mintTxId) {
         await awaitTransactionSignatureConfirmation(mintTxId, txTimeoutInMilliseconds, connection, true);
-        callbackAfterMix?.();
+        callbackAfterCompose?.();
       }
     } catch (error) {
-      setIsMixing?.(false);
+      setIsComposing?.(false);
     }
 
-    setIsMixing?.(false);
+    setIsComposing?.(false);
   };
 
   return (
-    <button css={mixBtnCss} onClick={handleClick} disabled={!isMixPossible || isMixing}>
-      Mix
+    <button css={composeBtnCss} onClick={handleClick} disabled={!isComposePossible || isComposing}>
+      {isLoading || isComposing ? (
+        <>
+          <BallTriangle ariaLabel="loading-indicator" color={theme.color.skyblue} width={20} height={20} />
+          {isComposing && <span style={{ color: theme.color.skyblue, marginLeft: '10px' }}>Composing...</span>}
+        </>
+      ) : (
+        'Compose'
+      )}
     </button>
   );
 };
 
-export default MixtureMachine;
+export default ComposeMachine;

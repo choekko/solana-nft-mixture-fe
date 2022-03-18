@@ -2,20 +2,20 @@
 
 import * as anchor from '@project-serum/anchor';
 import TitleBox from 'components/TitleBox';
-import Inventory, { ReagentNftData } from 'pages/Mix/Inventory';
+import Inventory, { ReagentNftData } from 'pages/Compose/Inventory';
 import { css, Theme } from '@emotion/react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import MixtureMachine from 'components/core/MixtureMachine';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import ReagentCard from 'pages/Mix/ReagentCard';
+import ReagentCard from 'pages/Compose/ReagentCard';
 import { useWalletNfts } from '@nfteyez/sol-rayz-react';
 import { getCandyMachineCreator, getCandyMachineId } from 'components/core/MintMachine/utils/candy-machine';
 import { MetaData } from 'components/core/MixtureMachine/types/metaData';
 import axios from 'axios';
+import ComposeMachine from 'components/core/MixtureMachine/ComposeMachine';
 
-const Mix = () => {
+const Compose = () => {
   const wallet = useWallet();
-  const [isMixing, setIsMixing] = useState(false);
+  const [isComposing, setIsComposing] = useState(false);
   const [leftReagent, setLeftReagent] = useState<ReagentNftData | undefined>(undefined);
   const [rightReagent, setRightReagent] = useState<ReagentNftData | undefined>(undefined);
   const [reagentNftsData, setReagentNftsData] = useState<ReagentNftData[]>([]);
@@ -26,7 +26,7 @@ const Mix = () => {
   });
   const [candyMachineCreator, setCandyMachineCreator] = useState('');
 
-  const isProcessing = useMemo(() => isMixing || isLoading, [isMixing, isLoading]);
+  const isProcessing = useMemo(() => isComposing || isLoading, [isComposing, isLoading]);
 
   const fetchCandyMachineCreator = async () => {
     const candyMachineCreator = (await getCandyMachineCreator(getCandyMachineId()!))[0].toString();
@@ -91,10 +91,32 @@ const Mix = () => {
     if (!isClickPossible) {
       if (leftReagent && rightReagent) return;
       if (!leftReagent && !isClickPossible) {
+        if (
+          rightReagent &&
+          rightReagent.attributes.some(
+            ({ trait_type, value }) =>
+              trait_type === 'ElEMENT1' &&
+              value === clickedReagentNftsData.attributes.find(({ trait_type }) => trait_type === 'Element1').value,
+          )
+        ) {
+          alert('Same Element!');
+          return;
+        }
         setLeftReagent(clickedReagentNftsData);
         isClickPossible = true;
       }
       if (!rightReagent && !isClickPossible) {
+        if (
+          leftReagent &&
+          leftReagent.attributes.some(
+            ({ trait_type, value }) =>
+              trait_type === 'ElEMENT1' &&
+              value === clickedReagentNftsData.attributes.find(({ trait_type }) => trait_type === 'Element1').value,
+          )
+        ) {
+          alert('Same Element!');
+          return;
+        }
         setRightReagent(clickedReagentNftsData);
         isClickPossible = true;
       }
@@ -111,6 +133,11 @@ const Mix = () => {
     }
   };
 
+  const callbackAfterCompose = () => {
+    alert('Complete!\n See your wallet or inventory in Decompose Page');
+    window.location.reload();
+  };
+
   const childMints = useMemo(() => {
     const leftMint = leftReagent ? [new anchor.web3.PublicKey(leftReagent.mint)] : [];
     const rightMint = rightReagent ? [new anchor.web3.PublicKey(rightReagent.mint)] : [];
@@ -118,14 +145,22 @@ const Mix = () => {
   }, [leftReagent, rightReagent]);
 
   const childrenAttributes = useMemo(() => {
-    const leftAttributes = leftReagent ? leftReagent.attributes.map(attribute => attribute.value) : [];
-    const rightAttributes = rightReagent ? rightReagent.attributes.map(attribute => attribute.value) : [];
-    return [...leftAttributes, ...rightAttributes];
+    if (!leftReagent || !rightReagent) return [];
+    const leftElement = leftReagent.attributes.find(({ trait_type }) => trait_type === 'Element1').value;
+    const rightElement = rightReagent.attributes.find(({ trait_type }) => trait_type === 'Element1').value;
+
+    const attributes = [
+      { trait_type: 'Element1', value: leftElement },
+      { trait_type: 'Element2', value: rightElement },
+      { trait_type: 'Version', value: leftReagent.attributes.find(({ trait_type }) => trait_type === 'Version').value },
+    ];
+    return attributes;
   }, [leftReagent, rightReagent]);
 
   return (
-    <div css={mixWrapStyle}>
-      <TitleBox title="Mix Reagents" subTitle="You can also mix mixture." />
+    <div css={composeWrapStyle}>
+      <TitleBox title="Mix Reagents" subTitle="You can also compose mixture." />
+      {!wallet.publicKey && <span>Please Login</span>}
       {wallet?.publicKey && (
         <>
           <Inventory
@@ -138,13 +173,15 @@ const Mix = () => {
             <ReagentCard data={leftReagent} callbackAfterClick={callbackAfterReagentClick} disabled={isProcessing} />
             <ReagentCard data={rightReagent} callbackAfterClick={callbackAfterReagentClick} disabled={isProcessing} />
           </section>
-          <MixtureMachine
-            mixBtnCss={mixtureMachineBtnStyle}
+          <ComposeMachine
+            composeBtnCss={mixtureMachineBtnStyle}
             childMints={childMints}
             childrenAttributes={childrenAttributes}
             minChildMintsNumber={2}
-            setIsMixing={setIsMixing}
-            isMixing={isProcessing}
+            setIsComposing={setIsComposing}
+            isComposing={isComposing}
+            isLoading={isLoading}
+            callbackAfterCompose={callbackAfterCompose}
           />
         </>
       )}
@@ -152,7 +189,7 @@ const Mix = () => {
   );
 };
 
-const mixWrapStyle = css`
+const composeWrapStyle = css`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -174,10 +211,13 @@ const mixtureMachineBtnStyle = (theme: Theme) => css`
   background-color: ${theme.color.skyblue};
   margin-top: 20px;
   border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   &:disabled {
     background-color: ${theme.color.backgroundDark};
   }
 `;
 
-export default Mix;
+export default Compose;

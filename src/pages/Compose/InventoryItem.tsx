@@ -48,6 +48,9 @@ const InventoryItemStyle = (theme: Theme, isClicked: boolean) => css`
     width: 70px;
     height: 70px;
   }
+  span {
+    font-size: 12px;
+  }
 `;
 
 export default InventoryItem;

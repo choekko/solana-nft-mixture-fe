@@ -6,6 +6,7 @@ import { CandyMachineInfo } from 'components/core/MintMachine/types/candy';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { mintOneToken } from 'components/core/MintMachine/utils/mint';
 import { awaitTransactionSignatureConfirmation } from 'components/core/MintMachine/utils/connection';
+import { css } from '@emotion/react';
 window.Buffer = window.Buffer || require('buffer').Buffer;
 
 interface MintMachineProps {
@@ -141,11 +142,33 @@ const MintMachine = ({ mintTxt = 'Mint' }: MintMachineProps) => {
 
   return (
     <>
-      <button disabled={!isActive || isUserMinting} onClick={handleMintBtnClick}>
+      <button
+        css={mintBtnStyle}
+        disabled={!isActive || isUserMinting || !wallet.publicKey}
+        onClick={handleMintBtnClick}
+      >
         {renderingTxt}
+        {isActive && !isUserMinting && wallet.publicKey && (
+          <>
+            <img alt="buy" src={'/assets/icon/coin_dark.png'} />
+            0.1
+          </>
+        )}
       </button>
     </>
   );
 };
+
+const mintBtnStyle = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+  }
+`;
 
 export default MintMachine;

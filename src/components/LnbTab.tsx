@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface LnbTabProps {
-  tabName: 'home' | 'purchase' | 'log' | 'mix' | 'compare';
+  tabName: 'home' | 'purchase' | 'compose' | 'decompose' | 'compare';
 }
 
 const LnbTab = ({ tabName }: LnbTabProps) => {
@@ -73,6 +73,7 @@ const LabTabStyle = (theme: Theme, tabName: string, isActive: boolean) => css`
   img {
     width: 50px;
     height: 50px;
+    ${tabName === 'decompose' ? 'margin-bottom: 5px' : null};
   }
 
   span {

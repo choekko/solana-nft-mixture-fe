@@ -1,7 +1,8 @@
 import * as anchor from '@project-serum/anchor';
 import { MIXTURE_MACHINE_PROGRAM } from 'components/core/MintMachine/const/candy';
-import { makeParentMetaData } from 'components/core/MixtureMachine/utils/metaData';
+import { calculateImageNumber, Element, makeParentMetaData } from 'components/core/MixtureMachine/utils/metaData';
 import axios, { AxiosResponse } from 'axios';
+import { getAttributeValue } from 'utils/metadata';
 
 interface UploaderResponse {
   status: 'success' | 'fail';
@@ -13,12 +14,17 @@ export const getMixtureMachineId = async (
   payer: anchor.web3.PublicKey,
   mint: anchor.web3.PublicKey,
   childMints: anchor.web3.PublicKey[],
-  childrenAttributes: string[],
+  childrenAttributes: Array<{ trait_type: string; value: string }>,
 ): Promise<anchor.web3.PublicKey> => {
   try {
+    const leftElement = getAttributeValue(childrenAttributes, 'Element1');
+    const rightElement = getAttributeValue(childrenAttributes, 'Element2');
+    if (!leftElement || !rightElement) throw new Error('Attributes error');
+    const imageNumber = calculateImageNumber([leftElement as Element, rightElement as Element]);
+    if (imageNumber === 0) throw new Error('Attributes error');
+
     const requestData = makeParentMetaData({
-      uniqNumber: 2,
-      imageNumber: 2,
+      imageNumber,
       payer,
       parentNftMint: mint,
       childNftMints: childMints,
@@ -58,10 +64,10 @@ export const getMixtureMachineState = async (
 };
 
 export const getMixtureMachineCreator = async (
-  mixtureMachine: anchor.web3.PublicKey,
+  mixtureMachine?: anchor.web3.PublicKey,
 ): Promise<[anchor.web3.PublicKey, number]> => {
   return await anchor.web3.PublicKey.findProgramAddress(
-    [Buffer.from('mixture_machine'), mixtureMachine.toBuffer()],
+    mixtureMachine ? [Buffer.from('mixture_machine'), mixtureMachine.toBuffer()] : [Buffer.from('mixture_machine')],
     MIXTURE_MACHINE_PROGRAM,
   );
 };

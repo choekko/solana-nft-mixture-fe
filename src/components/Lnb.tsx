@@ -4,18 +4,17 @@ import { css, Theme } from '@emotion/react';
 import LnbTab from './LnbTab';
 
 const Lnb = () => {
-  const tabs = ['home', 'purchase', 'mix', 'log', 'compare'] as const;
+  const tabs = ['home', 'purchase', 'compose', 'decompose'] as const;
 
   return (
     <nav css={lnbCss}>
       <div css={{ flex: 'none' }}>
         <div css={logoCss}>
-          <img src="/assets/icon/logo_temporary.png" alt="logo" />
+          <img src="/assets/icon/logo.png" alt="logo" />
         </div>
-        {tabs.map(tab => tab !== 'compare' && <LnbTab key={tab} tabName={tab} />)}
-      </div>
-      <div css={{ marginBottom: '20px' }}>
-        <LnbTab tabName="compare" />
+        {tabs.map(tab => (
+          <LnbTab key={tab} tabName={tab} />
+        ))}
       </div>
     </nav>
   );
