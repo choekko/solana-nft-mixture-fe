@@ -155,6 +155,11 @@ const MintMachine = ({ mintTxt = 'Mint' }: MintMachineProps) => {
           </>
         )}
       </button>
+      {isActive && (
+        <p css={remainingTextStyle}>
+          <span style={{ color: '#3DA1FF' }}>{itemsRemaining}</span> / {candyMachineInfo?.state.itemsAvailable}
+        </p>
+      )}
     </>
   );
 };
@@ -169,6 +174,12 @@ const mintBtnStyle = css`
     width: 20px;
     height: 20px;
   }
+`;
+
+const remainingTextStyle = css`
+  margin: 10px 0 0 0;
+  text-align: center;
+  color: white;
 `;
 
 export default MintMachine;

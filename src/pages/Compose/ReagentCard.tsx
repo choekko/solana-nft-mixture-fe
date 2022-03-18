@@ -13,10 +13,15 @@ interface ReagentCardProps {
 
 const ReagentCard = ({ data, callbackAfterClick, disabled }: ReagentCardProps) => {
   const isActive = Boolean(data);
-  const handleClick = () => {
+  const handleReagentCardClick = () => {
     if (data && !disabled) {
       callbackAfterClick?.(data.mint);
     }
+  };
+
+  const handleClipboardBtnClick = (e: MouseEvent, txt: string) => {
+    e.stopPropagation();
+    saveToClipboard(txt);
   };
 
   const attributes = useMemo(() => {
@@ -30,7 +35,7 @@ const ReagentCard = ({ data, callbackAfterClick, disabled }: ReagentCardProps) =
 
   return (
     <article css={theme => reagentCardWrapStyle(theme, isActive)}>
-      <div css={reagentCardStyle} onClick={handleClick}>
+      <div css={reagentCardStyle} onClick={handleReagentCardClick}>
         <div css={imageWrapStyle}>{data && <img alt="reagent" src={data.imageUrl} />}</div>
         <div css={descriptionWrapStyle}>
           <span css={theme => nameStyle(theme, isActive)}> {data ? data.data.name : 'Select Reagent'}</span>
@@ -43,7 +48,7 @@ const ReagentCard = ({ data, callbackAfterClick, disabled }: ReagentCardProps) =
             {data && (
               <>
                 Mint : {data && data.mint.slice(0, 5) + '...' + data.mint.slice(-5)}
-                <img src="/assets/icon/clipboard.png" onClick={() => saveToClipboard(data.mint)} />
+                <img src="/assets/icon/clipboard.png" onClick={e => handleClipboardBtnClick(e, data.mint)} />
               </>
             )}
           </span>
