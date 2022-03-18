@@ -160,7 +160,11 @@ const Compose = () => {
   return (
     <div css={composeWrapStyle}>
       <TitleBox title="Mix Reagents" subTitle="You can also compose mixture." />
-      {!wallet.publicKey && <span>Please Login</span>}
+      {!wallet.publicKey && (
+        <label css={loginMessageStyle} htmlFor="wallet_btn">
+          <span>Please Connect Wallet</span>
+        </label>
+      )}
       {wallet?.publicKey && (
         <>
           <Inventory
@@ -217,6 +221,23 @@ const mixtureMachineBtnStyle = (theme: Theme) => css`
 
   &:disabled {
     background-color: ${theme.color.backgroundDark};
+  }
+`;
+
+const loginMessageStyle = (theme: Theme) => css`
+  padding: 20px;
+  border: 1px solid #376086;
+  border-radius: 20px;
+  margin: 30px 0;
+
+  &:hover {
+    background-color: ${theme.color.skyblue};
+    cursor: pointer;
+  }
+
+  & > span {
+    font-size: 30px;
+    font-weight: bold;
   }
 `;
 

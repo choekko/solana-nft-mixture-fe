@@ -51,7 +51,6 @@ const Decompose = () => {
         reagentNftsData[idx]['attributes'] = metaData.attributes;
         reagentNftsData[idx]['properties'] = metaData.properties;
       });
-      console.log(metaDataList);
       reagentNftsData = reagentNftsData.filter(reagentNft => {
         if (Number(getAttributeValue(reagentNft.attributes, 'Version')) !== Version) {
           return false;
@@ -94,8 +93,6 @@ const Decompose = () => {
     : undefined;
   const childMints = child1 && child2 ? [child1, child2] : [];
 
-  console.log(parentMint, parentMixtureProgramId, child1, child2);
-
   const isPossible = useMemo(
     () => parentMint && parentMixtureProgramId && child1 && child2 && childMints,
     [parentMint, parentMixtureProgramId, child2, child1, childMints],
@@ -105,11 +102,15 @@ const Decompose = () => {
     alert('Complete!');
     window.location.reload();
   };
-  console.log(selectedNftData);
   return (
     <>
       <div css={decomposeWrapStyle}>
         <TitleBox title="Separate Mixture" subTitle="You can get the reagents back before synthesizing" />
+        {!wallet?.publicKey && (
+          <label css={loginMessageStyle} htmlFor="wallet_btn">
+            <span>Please Connect Wallet</span>
+          </label>
+        )}
         {wallet?.publicKey && (
           <>
             <Inventory
@@ -170,5 +171,22 @@ const decomposeMachineBtnStyle = (theme: Theme) => css`
 
   &:disabled {
     background-color: ${theme.color.backgroundDark};
+  }
+`;
+
+const loginMessageStyle = (theme: Theme) => css`
+  padding: 20px;
+  border: 1px solid #376086;
+  border-radius: 20px;
+  margin: 30px 0;
+
+  &:hover {
+    background-color: ${theme.color.skyblue};
+    cursor: pointer;
+  }
+
+  & > span {
+    font-size: 30px;
+    font-weight: bold;
   }
 `;
