@@ -8,7 +8,7 @@ import { useWalletNfts } from '@nfteyez/sol-rayz-react';
 import Inventory, { ReagentNftData } from 'pages/Compose/Inventory';
 import ReagentCard from 'pages/Compose/ReagentCard';
 import { css, Theme } from '@emotion/react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MetaData } from 'components/core/MixtureMachine/types/metaData';
 import axios from 'axios';
 import { getAttributeValue } from 'utils/metadata';
@@ -25,14 +25,13 @@ const Decompose = () => {
   const [isDecomposing, setIsDecomposing] = useState(false);
   const [reagentNftsData, setReagentNftsData] = useState<ReagentNftData[]>([]);
   const [selectedNftData, setSelectedNftData] = useState<ReagentNftData | undefined>(undefined);
-  console.log(nfts);
 
   const getMetaData = async (metadataUrl: string): Promise<MetaData> => {
     try {
       const response = await axios.get(metadataUrl);
       return response.data;
     } catch (error) {
-      throw new Error('getMetaData');
+      throw new Error('getMetaData Error');
     }
   };
 
@@ -77,13 +76,21 @@ const Decompose = () => {
       reagentNftData => reagentNftData.mint === mintAccountAddress,
     );
     const clickedReagentNftData = reagentNftsData[clickedReagentNftDataIndex];
-    setSelectedNftData(clickedReagentNftData);
+
+    setSelectedNftData(selectedNftData?.mint !== mintAccountAddress ? clickedReagentNftData : undefined);
+    setReagentNftsData(
+      reagentNftsData.map(reagentNftData => ({
+        ...reagentNftData,
+        isClicked:
+          reagentNftData.mint === clickedReagentNftData.mint ? !reagentNftData.isClicked : reagentNftData.isClicked,
+      })),
+    );
   };
 
-  const parentMint = selectedNftData ? new anchor.web3.PublicKey(selectedNftData.mint) : undefined;
+  const parentMint = selectedNftData ? new anchor.web3.PublicKey(selectedNftData.mint) : null;
   const parentMixtureProgramId = selectedNftData
     ? new anchor.web3.PublicKey(selectedNftData.data.creators[1].address)
-    : undefined;
+    : null;
 
   const child2 = selectedNftData
     ? new anchor.web3.PublicKey(selectedNftData.properties.children[0].pubkeys[0])
@@ -92,11 +99,6 @@ const Decompose = () => {
     ? new anchor.web3.PublicKey(selectedNftData.properties.children[0].pubkeys[1])
     : undefined;
   const childMints = child1 && child2 ? [child1, child2] : [];
-
-  const isPossible = useMemo(
-    () => parentMint && parentMixtureProgramId && child1 && child2 && childMints,
-    [parentMint, parentMixtureProgramId, child2, child1, childMints],
-  );
 
   const callbackAfterDecompose = () => {
     alert('Complete!');
@@ -122,18 +124,16 @@ const Decompose = () => {
             <section css={reagentCardsWrapStyle}>
               <ReagentCard data={selectedNftData} callbackAfterClick={callbackAfterReagentClick} disabled={isLoading} />
             </section>
-            {isPossible && (
-              <DecomposeMachine
-                decomposeBtnCss={decomposeMachineBtnStyle}
-                isLoading={isLoading}
-                parentMint={parentMint!}
-                parentMixtureProgramId={parentMixtureProgramId!}
-                childMints={childMints}
-                isDecomposing={isDecomposing}
-                setIsDecomposing={setIsDecomposing}
-                callbackAfterDecompose={callbackAfterDecompose}
-              />
-            )}
+            <DecomposeMachine
+              decomposeBtnCss={decomposeMachineBtnStyle}
+              isLoading={isLoading}
+              parentMint={parentMint}
+              parentMixtureProgramId={parentMixtureProgramId}
+              childMints={childMints}
+              isDecomposing={isDecomposing}
+              setIsDecomposing={setIsDecomposing}
+              callbackAfterDecompose={callbackAfterDecompose}
+            />
           </>
         )}
       </div>

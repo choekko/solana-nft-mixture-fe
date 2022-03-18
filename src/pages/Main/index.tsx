@@ -88,11 +88,14 @@ const btnWrapStyle = (theme: Theme) => css`
     align-items: center;
     border-radius: 20px;
     background-color: ${theme.color.skyblue};
-
     color: ${theme.color.dark};
     text-decoration: none;
     font-size: 20px;
     font-weight: bold;
+
+    img {
+      margin-bottom: 3px;
+    }
   }
 
   img {
