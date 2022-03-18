@@ -12,12 +12,12 @@ import {
 import { getMetadata } from 'components/core/MintMachine/utils/metaplex';
 import { TOKEN_METADATA_PROGRAM_ID } from 'components/core/MintMachine/const/candy';
 import { sendTransactions } from 'components/core/MintMachine/utils/connection';
-import { MixtureMachine } from 'components/core/MixtureMachine/types/mixtureMachine';
+import { MixtureMachineInfo } from 'components/core/MixtureMachine/types/mixtureMachine';
 import { getMixtureMachineCreator } from 'components/core/MixtureMachine/utils/mixtureMachine';
 
-export const mix = async (
+export const compose = async (
   newMintKeyPair: anchor.web3.Keypair,
-  mixtureMachineInfo: MixtureMachine,
+  mixtureMachineInfo: MixtureMachineInfo,
   payer: anchor.web3.PublicKey, // 지갑 주소
   childMints: anchor.web3.PublicKey[],
 ): Promise<(string | undefined)[]> => {
@@ -45,15 +45,17 @@ export const mix = async (
       createMintToInstruction(mint.publicKey, userTokenAccountAddress, payer, 1, [], TOKEN_PROGRAM_ID),
     ]; // ------- signer : mint
 
+    const [mixtureMachineCreator, creatorBump] = await getMixtureMachineCreator(mixtureMachineAddress);
+
     const transferAuthorityKeypair = anchor.web3.Keypair.generate();
     const vaultAddressList = await Promise.all(
-      childMints.map(async childMint => (await getAtaForMint(childMint, mixtureMachineAddress))[0]),
+      childMints.map(async childMint => (await getAtaForMint(childMint, mixtureMachineCreator))[0]),
     );
     const childAtaList = await Promise.all(
       childMints.map(async childMint => (await getAtaForMint(childMint, payer))[0]),
     );
 
-    const remainingAccount = childMints.flatMap((childMint, idx) => [
+    const remainingAccounts = childMints.flatMap((childMint, idx) => [
       {
         pubkey: transferAuthorityKeypair.publicKey,
         isWritable: true,
@@ -83,7 +85,7 @@ export const mix = async (
         createAssociatedTokenAccountInstruction(
           payer,
           vaultAddress,
-          mixtureMachineAddress,
+          mixtureMachineCreator,
           childMints[idx],
           TOKEN_PROGRAM_ID,
         ),
@@ -97,7 +99,6 @@ export const mix = async (
     );
 
     const metadataAddress = await getMetadata(mint.publicKey);
-    const [mixtureMachineCreator, creatorBump] = await getMixtureMachineCreator(mixtureMachineAddress);
 
     instructions.push(
       await mixtureMachineInfo.program.instruction.composeNft(creatorBump, {
@@ -116,7 +117,7 @@ export const mix = async (
           recentBlockhashes: SYSVAR_SLOT_HASHES_PUBKEY,
           instructionSysvarAccount: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
         },
-        remainingAccounts: remainingAccount,
+        remainingAccounts: remainingAccounts,
       }),
     );
 

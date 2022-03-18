@@ -4,11 +4,12 @@ import { css } from '@emotion/react';
 import { NftTokenAccount } from '@nfteyez/sol-rayz-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
-import InventoryItem from 'pages/Mix/InventoryItem';
+import InventoryItem from 'pages/Compose/InventoryItem';
 
 export interface ReagentNftData extends NftTokenAccount {
   imageUrl: string;
   attributes: any[];
+  properties?: any;
   isClicked?: boolean;
 }
 
@@ -31,8 +32,7 @@ const Inventory = ({ reagentNftsData, callbackAfterReagentClick, isLoading, disa
         <span style={{ right: 0 }}>inventory </span>
         {isLoading ? (
           <div css={inventoryStyle}>
-            {' '}
-            <span>isLoading...</span>{' '}
+            <span>isLoading...</span>
           </div>
         ) : reagentNftsData.length <= 7 ? (
           <div css={inventoryStyle}>

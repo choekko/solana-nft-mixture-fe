@@ -20,11 +20,10 @@ export const getCandyMachineId = (type?: string): anchor.web3.PublicKey | undefi
 
 export const getCandyMachineCreator = async (
   candyMachine: anchor.web3.PublicKey,
-  type?: string,
 ): Promise<[anchor.web3.PublicKey, number]> => {
   return await anchor.web3.PublicKey.findProgramAddress(
     [Buffer.from('candy_machine'), candyMachine.toBuffer()],
-    type === 'mixture' ? MIXTURE_MACHINE_PROGRAM : CANDY_MACHINE_PROGRAM,
+    CANDY_MACHINE_PROGRAM,
   );
 };
 
@@ -50,7 +49,6 @@ export const getCandyMachineState = async (
   const itemsAvailable = state.data.itemsAvailable.toNumber(); // 가능 개수
   const itemsRedeemed = state.itemsRedeemed.toNumber(); // 팔린 개수
   const itemsRemaining = itemsAvailable - itemsRedeemed; // 남은 개수
-  console.log('walleeeeet::', state.wallet);
 
   return {
     id: candyMachineId, // 캔디머신 프로그램 Id

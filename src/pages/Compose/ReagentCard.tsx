@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css, Theme } from '@emotion/react';
-import { ReagentNftData } from 'pages/Mix/Inventory';
+import { ReagentNftData } from 'pages/Compose/Inventory';
+import { getAttributeValue } from 'utils/metadata';
 
 interface ReagentCardProps {
   data?: ReagentNftData;
@@ -21,7 +22,12 @@ const ReagentCard = ({ data, callbackAfterClick, disabled }: ReagentCardProps) =
       <div css={reagentCardStyle} onClick={handleClick}>
         <div css={imageWrapStyle}>{data && <img alt="reagent" src={data.imageUrl} />}</div>
         <span css={theme => nameStyle(theme, isActive)}> {data ? data.data.name : 'Select Reagent'}</span>
-        <div css={attributesWrapStyle}>{data && data.attributes.map(attribute => <span>{attribute.value}</span>)}</div>
+        <div css={attributesWrapStyle}>
+          {data && <span>{getAttributeValue(data.attributes, 'Element1')}</span>}
+          {data && getAttributeValue(data.attributes, 'Element2') && (
+            <span>{getAttributeValue(data.attributes, 'Element2')}</span>
+          )}
+        </div>
       </div>
     </article>
   );
@@ -60,6 +66,11 @@ const imageWrapStyle = (theme: Theme) => css`
   justify-content: center;
   align-items: center;
   background-color: ${theme.color.backgroundDeepDark};
+
+  img {
+    width: 190px;
+    height: 190px;
+  }
 `;
 
 const attributesWrapStyle = css`
