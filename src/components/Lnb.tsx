@@ -29,6 +29,7 @@ const lnbCss = (theme: Theme) => css`
   width: 100px;
   height: 100%;
   background-color: ${theme.color.dark};
+  z-index: 99;
 `;
 
 const logoCss = css`

@@ -18,7 +18,7 @@ function App() {
   // You can also provide a custom RPC endpoint.
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
-  const isMobile = useMediaQuery({ maxWidth: 1224 });
+  const isMobile = useMediaQuery({ maxDeviceWidth: 1224 });
 
   if (isMobile) return <Mobile />;
 
