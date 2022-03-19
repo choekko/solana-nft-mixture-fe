@@ -160,7 +160,7 @@ const Compose = () => {
       <TitleBox title="Compose Reagents" subTitle="You can also compose reagents." />
       {!wallet.publicKey && (
         <label css={loginMessageStyle} htmlFor="wallet_btn">
-          <span>Please Connect Wallet</span>
+          <span>Please Connect Phantom Wallet</span>
         </label>
       )}
       {wallet?.publicKey && (

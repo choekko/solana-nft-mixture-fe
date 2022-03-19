@@ -109,7 +109,7 @@ const Decompose = () => {
         <TitleBox title="Decompose Mixture" subTitle="You can go back to before mixing." />
         {!wallet?.publicKey && (
           <label css={loginMessageStyle} htmlFor="wallet_btn">
-            <span>Please Connect Wallet</span>
+            <span>Please Connect Phantom Wallet</span>
           </label>
         )}
         {wallet?.publicKey && (
