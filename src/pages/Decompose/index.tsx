@@ -101,7 +101,7 @@ const Decompose = () => {
 
   const callbackAfterDecompose = () => {
     alert('Decompose Succeeded!\nCheck your wallet or inventory in Decompose Page (on devnet)!');
-    setIsDecomposing(false);
+    window.location.reload();
   };
   return (
     <>
