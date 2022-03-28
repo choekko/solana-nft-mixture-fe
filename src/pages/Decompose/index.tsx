@@ -13,8 +13,6 @@ import { MetaData } from 'components/core/MixtureMachine/types/metaData';
 import axios from 'axios';
 import { getAttributeValue } from 'utils/metadata';
 
-const Version = 1;
-
 const Decompose = () => {
   const wallet = useWallet();
   const { connection } = useConnection();
@@ -51,7 +49,7 @@ const Decompose = () => {
         reagentNftsData[idx]['properties'] = metaData.properties;
       });
       reagentNftsData = reagentNftsData.filter(reagentNft => {
-        if (Number(getAttributeValue(reagentNft.attributes, 'Version')) !== Version) {
+        if (Number(getAttributeValue(reagentNft.attributes, 'Version')) !== Number(process.env.REACT_APP_VERSION)) {
           return false;
         }
         if (!reagentNft.properties.children) {
