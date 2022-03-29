@@ -32,7 +32,7 @@ const Inventory = ({ reagentNftsData, callbackAfterReagentClick, isLoading, disa
         <span css={inventoryDecorationTextStyle}>inventory </span>
         {isLoading ? (
           <div css={inventoryStyle}>
-            <span>isLoading...</span>
+            <span>loading...</span>
           </div>
         ) : reagentNftsData.length === 0 ? (
           <div css={inventoryStyle}>
